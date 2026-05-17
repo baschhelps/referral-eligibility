@@ -5,7 +5,7 @@ let answers = {};
 // ✅ Boroughs
 const supportedBoroughs = [
   "Westminster","Camden","Hillingdon","Hounslow",
-  "Eailing","Hammersmith and Fulham","Brent","Kensington and Chelsea"
+  "Ealing","Hammersmith and Fulham","Brent","Kensington and Chelsea"
 ];
 
 const allBoroughs = [
@@ -18,7 +18,7 @@ const allBoroughs = [
   "Tower Hamlets","Waltham Forest","Wandsworth","Westminster"
 ];
 
-// ✅ Progress bar
+// ✅ Progress
 function progressUI() {
   const total = 7;
   const percent = Math.round((Math.min(step, total) / total) * 100);
@@ -33,7 +33,7 @@ function progressUI() {
   `;
 }
 
-// ✅ Professional rejection screen
+// ✅ Rejection screen (professional)
 function rejection(title, message, extra = "") {
   return `
     <div class="card">
@@ -45,7 +45,7 @@ function rejection(title, message, extra = "") {
       ${extra ? `<div class="alert">${extra}</div>` : ""}
 
       <p class="reassurance">
-        Where appropriate, please contact the AngelBox team for further guidance.
+        Where appropriate, please contact the AngelBox team for further clarification.
       </p>
 
       <button class="back" onclick="reset()">Start again</button>
@@ -54,16 +54,16 @@ function rejection(title, message, extra = "") {
   `;
 }
 
-// ✅ MAIN RENDER
 function render() {
   const el = document.getElementById("app");
 
   // ✅ FAIL STATES
+
   if (step === "boroughFail") {
     el.innerHTML = rejection(
       "Outside service area",
       `This referral relates to ${answers.borough}, which is outside current service coverage.`,
-      "Please refer to local provision in the relevant borough."
+      "Please refer to appropriate local services within that borough."
     );
     return;
   }
@@ -71,7 +71,8 @@ function render() {
   if (step === "residencyFail") {
     el.innerHTML = rejection(
       "Residency criteria not met",
-      "This residency category falls outside current eligibility criteria."
+      "This residency category may require a higher financial support threshold.",
+      "These circumstances may fall outside the eligibility criteria used for AngelBox referrals."
     );
     return;
   }
@@ -87,8 +88,8 @@ function render() {
   if (step === "directorFail") {
     el.innerHTML = rejection(
       "Unable to assess financial position",
-      "Company directors may have non-standard income structures.",
-      "This can include dividends, director loans, or business-funded expenses, making fair assessment difficult."
+      "Company directors may have complex or variable income structures.",
+      "This can include dividends, director loans, or business-funded personal expenses."
     );
     return;
   }
@@ -97,7 +98,7 @@ function render() {
     el.innerHTML = rejection(
       "Application timing",
       "The expected due date is outside the current intake window.",
-      "Referrals are typically processed closer to delivery."
+      "Referrals are typically accepted closer to the due date."
     );
     return;
   }
@@ -105,28 +106,26 @@ function render() {
   if (step === "evidenceFail") {
     el.innerHTML = rejection(
       "Supporting evidence required",
-      "Evidence is required to assess eligibility and prioritise referrals."
+      "Evidence is required to assess eligibility and prioritisation."
     );
     return;
   }
 
-  // ✅ STEP 0 — Start
+  // ✅ STEP 0 START
   if (step === 0) {
     el.innerHTML = `
       <div class="card">
-
         <p>
-          This tool helps confirm whether a referral meets the initial eligibility criteria for AngelBox support.
+          This tool supports professionals in determining whether a referral meets initial AngelBox eligibility criteria.
         </p>
 
         <button class="btn primary" onclick="step=1; render()">
           Start eligibility check
         </button>
-
       </div>`;
   }
 
-  // ✅ STEP 1 — Borough
+  // ✅ STEP 1 Borough
   else if (step === 1) {
     el.innerHTML = `
       <div class="card">
@@ -136,7 +135,7 @@ function render() {
 
         <select id="borough">
           <option value="">Select borough</option>
-          ${allBoroughs.map(b => `<option>${b}</option>`).join("")}
+          ${allBoroughs.map(b=>`<option>${b}</option>`).join("")}
         </select>
 
         <button class="btn primary" onclick="nextBorough()">Continue</button>
@@ -144,7 +143,7 @@ function render() {
       </div>`;
   }
 
-  // ✅ STEP 2 — Residency
+  // ✅ STEP 2 Residency (FIXED + FULL LIST)
   else if (step === 2) {
     el.innerHTML = `
       <div class="card">
@@ -152,12 +151,23 @@ function render() {
 
         <p>What is the applicant’s residency status?</p>
 
+        <p class="reassurance">
+          Select the most accurate option based on available information.
+        </p>
+
         <select id="residency">
           <option value="">Select</option>
-          <option value="uk">UK citizen or settled</option>
+
+          <option value="uk">UK citizen or settled (ILR)</option>
           <option value="asylum">Asylum seeker or refugee</option>
           <option value="limited">Limited leave to remain</option>
+
           <option value="student">Student visa</option>
+          <option value="visitor">Visitor visa</option>
+          <option value="spouse">Spouse / partner visa</option>
+          <option value="fiance">Fiancé visa</option>
+
+          <option value="other">Other / unsure</option>
         </select>
 
         <button class="btn primary" onclick="nextResidency()">Continue</button>
@@ -165,7 +175,7 @@ function render() {
       </div>`;
   }
 
-  // ✅ STEP 3 — Employment
+  // ✅ STEP 3 Employment
   else if (step === 3) {
     el.innerHTML = `
       <div class="card">
@@ -186,7 +196,7 @@ function render() {
       </div>`;
   }
 
-  // ✅ STEP 4 — Income
+  // ✅ STEP 4 Income
   else if (step === 4) {
     el.innerHTML = `
       <div class="card">
@@ -201,7 +211,7 @@ function render() {
       </div>`;
   }
 
-  // ✅ STEP 5 — Director
+  // ✅ STEP 5 Director
   else if (step === 5) {
     el.innerHTML = `
       <div class="card">
@@ -216,7 +226,7 @@ function render() {
       </div>`;
   }
 
-  // ✅ STEP 6 — Due date
+  // ✅ STEP 6 Due date
   else if (step === 6) {
     el.innerHTML = `
       <div class="card">
@@ -231,7 +241,7 @@ function render() {
       </div>`;
   }
 
-  // ✅ STEP 7 — Evidence
+  // ✅ STEP 7 Evidence
   else if (step === 7) {
     el.innerHTML = `
       <div class="card">
@@ -268,19 +278,18 @@ function render() {
         </p>
 
         <button class="back" onclick="reset()">Start again</button>
-
       </div>`;
   }
 }
 
 // ✅ HANDLERS
+
 function nextBorough() {
   const val = document.getElementById("borough").value;
   if (!val) return alert("Select a borough");
 
   answers.borough = val;
   step = supportedBoroughs.includes(val) ? 2 : "boroughFail";
-
   render();
 }
 
@@ -288,7 +297,12 @@ function nextResidency() {
   const val = document.getElementById("residency").value;
   if (!val) return alert("Select residency");
 
-  step = val === "student" ? "residencyFail" : 3;
+  answers.residency = val;
+
+  const excluded = ["student","visitor","spouse","fiance"];
+
+  step = excluded.includes(val) ? "residencyFail" : 3;
+
   render();
 }
 
@@ -314,6 +328,7 @@ function handleDueDate() {
   const diff = (new Date(val) - new Date()) / (1000 * 60 * 60 * 24);
 
   step = diff > 60 ? "dueDateFail" : 7;
+
   render();
 }
 
